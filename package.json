@@ -4,10 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"yarn dev:emulate\" \"yarn dev:function\" \"yarn dev:vite\"",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:vite": "vite",
+    "dev:function": "pushd functions && yarn build:watch && popd",
+    "dev:emulate": "export GOOGLE_APPLICATION_CREDENTIALS='./functions/function-credentials.json' && firebase emulators:start"
   },
   "dependencies": {
     "firebase": "^9.22.1",
