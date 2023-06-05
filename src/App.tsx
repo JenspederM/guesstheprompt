@@ -1,76 +1,39 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Loading } from "./components/Loading";
+import { Container } from "./components/Container";
+import { routes } from "./routes";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+
+const router = createBrowserRouter(
+  routes.map((route) => {
+    return {
+      path: route.path,
+      element: route.element,
+    };
+  }),
+);
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const script = document.createElement("script");
-
-    script.src = "https://buttons.github.io/buttons.js";
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }, []);
 
+  if (loading) {
+    return (
+      <Container>
+        <Loading />
+      </Container>
+    );
+  }
+
   return (
-    <div>
-      <div className="h-screen bg-gradient-to-b from-gray-900 to-slate-800 flex flex-col text-white">
-        <header className="py-16">
-          <h1 className="text-5xl font-bold text-center mb-2">
-            Create Tailwind
-          </h1>
-          <p className="text-center mb-6 text-xl">
-            Please support this project by starring the repository on GitHub.
-          </p>
-          <div className="flex flex-row justify-center items-center gap-4">
-            <a
-              className="github-button"
-              href="https://github.com/andrejjurkin/create-tw"
-              data-color-scheme="no-preference: dark; light: dark; dark: dark;"
-              data-icon="octicon-star"
-              data-size="large"
-              data-show-count="true"
-              aria-label="Star andrejjurkin/create-tw on GitHub"
-            >
-              Star
-            </a>
-            <a
-              className="github-button"
-              href="https://github.com/andrejjurkin/create-tw/discussions"
-              data-color-scheme="no-preference: dark; light: dark; dark: dark;"
-              data-icon="octicon-comment-discussion"
-              data-size="large"
-              aria-label="Discuss andrejjurkin/create-tw on GitHub"
-            >
-              Discuss
-            </a>
-          </div>
-        </header>
-
-        <main className="flex-1">
-          <section className="text-center">
-            <h2 className="text-3xl font-medium text-center">
-              React.js Project Created using{" "}
-              <a
-                href="https://vitejs.dev/"
-                target="_blank"
-                className="text-indigo-300"
-              >
-                Vite
-              </a>
-            </h2>
-          </section>
-        </main>
-
-        <footer className="px-8 py-12 border-t border-gray-800">
-          <div className="px-8 font-medium text-center">
-            <a href="https://github.com/andrejjurkin/create-tw">
-              Create Tailwind
-            </a>
-          </div>
-        </footer>
+    <div className="flex flex-col absolute inset-0 items-center overscroll-contain max-h-screen min-h-0 overflow-hidden bg-base-200">
+      <div className="flex flex-col grow w-full max-w-4xl items-center bg-base-100 pb-8 px-4">
+        <RouterProvider router={router} />
       </div>
     </div>
   );
