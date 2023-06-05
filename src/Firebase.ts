@@ -6,13 +6,13 @@ import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { CreateImageRequest, CreateModerationRequest, CreateModerationResponse, ImagesResponse } from "openai";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAPvpeE4Avgt4s4cOLUFvTi0gNvn41DH2Q",
-  authDomain: "guesstheprompt-dabe5.firebaseapp.com",
-  projectId: "guesstheprompt-dabe5",
-  storageBucket: "guesstheprompt-dabe5.appspot.com",
-  messagingSenderId: "1057216610365",
-  appId: "1:1057216610365:web:5f1e54fce52e6af804ea54",
-  measurementId: "G-06D76GR4GX"
+  apiKey: import.meta.env["VITE_FIREBASE_API_KEY"],
+  authDomain: import.meta.env["VITE_FIREBASE_AUTH_DOMAIN"],
+  projectId: import.meta.env["VITE_FIREBASE_PROJECT_ID"],
+  storageBucket: import.meta.env["VITE_FIREBASE_STORAGE_BUCKET"],
+  messagingSenderId: import.meta.env["VITE_FIREBASE_MESSAGING_SENDER_ID"],
+  appId: import.meta.env["VITE_FIREBASE_APP_ID"],
+  measurementId: import.meta.env["VITE_FIREBASE_MEASUREMENT_ID"],
 };
 
 // Initialize Firebase
