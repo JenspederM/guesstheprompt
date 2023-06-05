@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
+import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const functions = getFunctions(app);
+const functions = getFunctions(app);
 
 if (import.meta.env.DEV) {
   // eslint-disable-next-line no-console
@@ -27,4 +27,12 @@ if (import.meta.env.DEV) {
   connectFunctionsEmulator(functions, "localhost", 5001);
   connectFirestoreEmulator(db, "localhost", 8080);
   connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+}
+
+export const api = {
+  openai: {
+    generateImage: httpsCallable(functions, "openai-generateImage"),
+    generateText: httpsCallable(functions, "openai-generateText"),
+    getModeration: httpsCallable(functions, "openai-getModeration"),
+  },
 }
