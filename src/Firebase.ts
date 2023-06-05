@@ -3,6 +3,7 @@ import { getAnalytics } from "firebase/analytics";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { CreateImageRequest, CreateModerationRequest, CreateModerationResponse, ImagesResponse } from "openai";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPvpeE4Avgt4s4cOLUFvTi0gNvn41DH2Q",
@@ -31,8 +32,8 @@ if (import.meta.env.DEV) {
 
 export const api = {
   openai: {
-    generateImage: httpsCallable(functions, "openai-generateImage"),
-    generateText: httpsCallable(functions, "openai-generateText"),
+    generateImage: httpsCallable<CreateImageRequest, undefined | ImagesResponse>(functions, "openai-generateImage"),
+    generateText: httpsCallable<CreateModerationRequest, undefined | CreateModerationResponse>(functions, "openai-generateText"),
     getModeration: httpsCallable(functions, "openai-getModeration"),
   },
 }
