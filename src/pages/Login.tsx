@@ -76,7 +76,7 @@ export const Login = () => {
         close={closeConsentModal}
         signIn={signInWithConsent}
       />
-      <div className="flex w-full grow items-center justify-center">
+      <div className="absolute inset-0 flex w-full grow items-center justify-center">
         <div className="bg-base-200 rounded-box p-4 items-center">
           <div className="text-5xl font-bold">Login Now!</div>
           <div className="divider"></div>
