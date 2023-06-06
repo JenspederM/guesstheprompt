@@ -21,7 +21,7 @@ type CustomNotification = {
 };
 
 type AppContextProps = {
-  user: User | null;
+  user: User;
   notifications: CustomNotification[];
   addNotification: (notification: CustomNotification) => void;
   isLoading: boolean;
@@ -37,6 +37,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isWelcoming, setIsWelcoming] = useState<boolean>(true);
 
   const handleAuthChange = async (authUser: FirebaseUser | null) => {
+    console.log("Auth change", authUser);
     if (!authUser) {
       return;
     }
@@ -50,6 +51,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     if (userDoc && userDoc.exists()) {
       user = userDoc.data() as User;
       user.lastLogin = Date.now();
+      setUser(user);
       await updateDoc(doc(db, "users", user.id), user).catch((e) =>
         console.error("Error updating user", e),
       );
@@ -61,6 +63,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         lastLogin: Date.now(),
         createdAt: Date.now(),
       };
+      setUser(user);
       await setDoc(doc(db, "users", user.id), user).catch((e) =>
         console.error("Error creating user", e),
       );
@@ -104,7 +107,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   if (isWelcoming) {
     setTimeout(() => {
       setIsWelcoming(false);
-    }, 3000);
+    }, 1000);
 
     return <Welcome />;
   }

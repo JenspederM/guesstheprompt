@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom";
-import { GoBack } from "../components/GoBack";
 import { ThemeSelect } from "../components/ThemeSelect";
 import { GoHome } from "../components/GoHome";
 
@@ -36,11 +34,8 @@ export const allThemes = [
 ];
 
 export const Settings = () => {
-  let navigate = useNavigate();
-
   return (
     <>
-      <GoBack onClick={() => navigate("/")} text="Back" />
       <div className="grow w-full">
         <div>Theme</div>
         <ThemeSelect />

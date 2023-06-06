@@ -6,7 +6,6 @@ import {
 } from "firebase/auth";
 import { auth } from "../Firebase";
 import { useState } from "react";
-import { useApp } from "../providers/AppProvider";
 import { ThemeSelect } from "../components/ThemeSelect";
 import { delay } from "../utils";
 import { AnonymousLogo, FacebookLogo, GoogleLogo } from "../components/Icons";
@@ -27,7 +26,6 @@ const getConsentModal = async () => {
 
 export const Login = () => {
   const [signInMethod, setSignInMethod] = useState<SignInMethod>("Anonymously");
-  const app = useApp();
 
   const openConsentModal = async (signInMethod: SignInMethod) => {
     setSignInMethod(signInMethod);
