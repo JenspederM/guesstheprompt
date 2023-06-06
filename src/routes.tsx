@@ -1,5 +1,5 @@
 import { HomeIcon, PlayIcon, ToolsIcon } from "./components/Icons";
-import { Home, Play, Settings } from "./pages";
+import { Home, Play, Settings, Game, Lobby } from "./pages";
 
 export const routes = [
   {
@@ -19,5 +19,14 @@ export const routes = [
     name: "Settings",
     path: "/settings",
     element: <Settings />,
+  },
+  {
+    path: "/game/:roomCode",
+    element: <Game />,
+  },
+
+  {
+    path: "/lobby/:roomCode",
+    element: <Lobby />,
   },
 ];

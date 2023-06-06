@@ -24,7 +24,7 @@ const functions = getFunctions(app);
 
 if (import.meta.env.DEV) {
   // eslint-disable-next-line no-console
-  console.debug("Firebase Config", firebaseConfig);
+  console.log("Firebase Config", firebaseConfig);
   connectFunctionsEmulator(functions, "localhost", 5001);
   connectFirestoreEmulator(db, "localhost", 8080);
   connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
