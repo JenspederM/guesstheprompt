@@ -6,6 +6,7 @@ import { db } from "../Firebase";
 import { useApp } from "../providers/AppProvider";
 import { GoHome } from "../components/GoHome";
 import { AddIcon, PromptIcon } from "../components/Icons";
+import { findGameByRoomCode } from "../utils";
 
 export const Play = () => {
   let navigate = useNavigate();
@@ -24,30 +25,51 @@ export const Play = () => {
   };
 
   const validateInputs = () => {
+    if (!app?.user) return false;
     const _name = username.trim().toLowerCase();
     const _roomCode = roomCode.trim().toLowerCase();
 
     if (!_name) {
       setUsernameError("Please enter a name");
+      console.log("not valid");
       return false;
     }
     if (action === "join" && !_roomCode) {
       setRoomCodeError("Please enter a room code");
+      console.log("not valid");
       return false;
     }
     console.log("valid");
     return true;
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (!app?.user) return;
     const isValid = validateInputs();
 
     if (!isValid) {
-      console.log("not valid");
       return;
     }
 
-    updateDoc(doc(db, "users", app.user.id), { name: username });
+    await updateDoc(doc(db, "users", app.user.id), { name: username });
+
+    console.log("action", action);
+    if (action === "join") {
+      console.log("joining game");
+      const game = await findGameByRoomCode(roomCode, app.user.id);
+      console.log("game", game);
+      if (!game) {
+        setRoomCodeError("Game not found");
+        return;
+      }
+      await updateDoc(doc(db, "games", game.id), {
+        [`players.${app.user.id}`]: {
+          id: app.user.id,
+          name: username,
+          score: 0,
+        },
+      });
+    }
 
     navigate(`/lobby/${roomCode}`);
   };

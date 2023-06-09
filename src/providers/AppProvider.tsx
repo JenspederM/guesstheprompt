@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Loading } from "../components/Loading";
 import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase";
 import { Login } from "../pages";
-import { Welcome } from "../pages/Welcome";
+import { Welcome } from "../components/Welcome";
+import { Snackbar } from "../components/Snackbar";
 
 type User = {
   id: string;
@@ -14,14 +15,14 @@ type User = {
   createdAt: number;
 };
 
-type CustomNotification = {
+export type CustomNotification = {
   text: string;
   type: "success" | "error" | "warning" | "info";
   duration?: number;
 };
 
 type AppContextProps = {
-  user: User;
+  user?: User;
   notifications: CustomNotification[];
   addNotification: (notification: CustomNotification) => void;
   isLoading: boolean;
@@ -30,14 +31,13 @@ type AppContextProps = {
 
 const AppContext = createContext<AppContextProps>({} as AppContextProps);
 
-export const AppProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+export function AppProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User>();
   const [notifications, setNotifications] = useState<CustomNotification[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isWelcoming, setIsWelcoming] = useState<boolean>(true);
 
-  const handleAuthChange = async (authUser: FirebaseUser | null) => {
-    console.log("Auth change", authUser);
+  async function handleAuthChange(authUser: FirebaseUser | null) {
     if (!authUser) {
       return;
     }
@@ -52,9 +52,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       user = userDoc.data() as User;
       user.lastLogin = Date.now();
       setUser(user);
-      await updateDoc(doc(db, "users", user.id), user).catch((e) =>
-        console.error("Error updating user", e),
-      );
+      await updateDoc(doc(db, "users", user.id), {
+        lastLogin: user.lastLogin,
+      }).catch((e) => console.error("Error updating user", e));
     } else {
       user = {
         id: authUser.uid,
@@ -70,26 +70,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     setUser(user);
-  };
+  }
 
   useEffect(() => {
     const subscriber = onAuthStateChanged(auth, handleAuthChange);
     return subscriber;
   }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const unsubUser = onSnapshot(
-      doc(db, "users", user.id),
-      (doc) => {
-        setUser(doc.data() as User);
-      },
-      (e) => console.error("Error getting user from snapshot", e),
-    );
-
-    return unsubUser;
-  }, [user]);
 
   const addNotification = (notification: CustomNotification) => {
     setNotifications((prevNotifications) => [
@@ -116,10 +102,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     return <Loading />;
   }
 
-  if (!user) {
-    return <Login />;
-  }
-
   return (
     <AppContext.Provider
       value={{
@@ -132,21 +114,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     >
       <div className="flex flex-col absolute inset-0 items-center overscroll-contain max-h-screen min-h-0 overflow-hidden">
         <div className="flex flex-col grow w-full sm:max-w-md xl:max-w-2xl max-w-4xl items-center max-h-screen pt-8 pb-12 px-4">
-          {children}
-          <div className="toast toast-center">
-            {[...notifications].reverse().map((notification) => (
-              <div
-                key={notification.text}
-                className={`alert alert-${notification.type}`}
-              >
-                {notification.text}
-              </div>
-            ))}
-          </div>
+          {!user ? <Login /> : children}
+          <Snackbar notifications={notifications} />
         </div>
       </div>
     </AppContext.Provider>
   );
-};
+}
 
 export const useApp = () => useContext(AppContext);

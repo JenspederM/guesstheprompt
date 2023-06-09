@@ -1,45 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../providers/AppProvider";
 import { useEffect, useState } from "react";
-import { RoomCode } from "./RoomCode";
-import findGameByRoomCode from "../helpers/findGameByRoomCode";
-import { doc, setDoc } from "firebase/firestore";
+import { RoomCode } from "../components/RoomCode";
+import { findGameByRoomCode } from "../utils";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase";
-
-type Player = {
-  id: string;
-  name: string;
-  score: number;
-};
-
-type Game = {
-  id: string;
-  host: string;
-  roomCode: string;
-  type: string;
-  players: { [key: string]: Player };
-  round: number;
-  isStarted: boolean;
-  isFinished: boolean;
-  createdAt: string;
-  rating: number[];
-  comments: string[];
-};
-
-export type Round = {
-  id: number;
-  scenario: string;
-  images: string[];
-  bestImage: string;
-};
-
-export type PromptedImage = {
-  id: string;
-  type: string;
-  uri: string;
-  createdBy: string;
-  prompt: string;
-};
+import { generateSlug } from "random-word-slugs";
+import { firebaseGuid } from "../utils";
+import { Game, Player } from "../types";
+import { GoHome } from "../components/GoHome";
 
 export const Host = () => {
   const navigate = useNavigate();
@@ -48,7 +17,8 @@ export const Host = () => {
   const { user } = app;
 
   const generateRoomCode = () => {
-    const code = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const code = generateSlug(1);
+    console.log("generateRoomCode", code);
     setRoomCode(code);
   };
 
@@ -56,7 +26,6 @@ export const Host = () => {
     if (!user) return;
     const existingGame = await findGameByRoomCode(roomCode);
     if (existingGame) {
-      console.log("Game already exists");
       app.addNotification({
         text: "Game already exists. Please try again.",
         type: "error",
@@ -64,15 +33,16 @@ export const Host = () => {
       generateRoomCode();
       return;
     }
-    console.log("createGame");
+    // Create the user as a player
     const newPlayer: Player = {
       id: user.id,
       name: user.name,
       score: 0,
     };
 
+    // Create the game
     const newGame: Game = {
-      id: "",
+      id: firebaseGuid(),
       roomCode: roomCode,
       type: "simons",
       isStarted: false,
@@ -85,8 +55,14 @@ export const Host = () => {
       comments: [],
     };
 
+    // Add the game to the database
     await setDoc(doc(db, "games", newGame.id), newGame);
-    navigate(`/game/${roomCode}`);
+
+    // Set the current game for the user
+    await updateDoc(doc(db, "users", user.id), { currentGame: newGame.id });
+
+    // Navigate to the lobby
+    navigate(`/lobby/${roomCode}`);
   };
 
   useEffect(() => {
@@ -97,13 +73,17 @@ export const Host = () => {
     <>
       <div className="text-4xl">Create new game!</div>
       <div className="divider" />
-      <RoomCode roomCode="" />
+      <RoomCode roomCode={roomCode} />
       <div className="divider" />
+      <button onClick={generateRoomCode} className="btn btn-block btn-neutral">
+        Generate Room Code
+      </button>
 
-      <div className="flex flex-col grow justify-end w-full">
+      <div className="flex flex-col grow justify-end w-full space-y-4">
         <button className={`btn btn-block btn-primary`} onClick={createGame}>
           Create Game!
         </button>
+        <GoHome className="btn-secondary" />
       </div>
     </>
   );
