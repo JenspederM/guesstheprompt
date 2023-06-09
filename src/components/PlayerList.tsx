@@ -1,14 +1,10 @@
-export function PlayerList({
-  game,
-}: {
-  game: {
-    id: string;
-    host: string;
-    playersIds: string[];
-    players: { name: string; id: string }[];
-  };
-}) {
+import { Game } from "../types";
+
+export function PlayerList({ game }: { game: Game }) {
+  const playerIds = Object.keys(game.players);
+  const players = playerIds.map((id) => game.players[id]);
   const playerIcons = ["🧛‍♂️", "🤦🏽‍♀️", "🙅🏿‍♂️", "🙋🏼‍♀️", "🧔🏽‍♀️", "👳🏿‍♂️", "🕺🏻"];
+
   return (
     <div className="flex flex-col w-full grow items-center justify-start overflow-hidden py-4">
       <div className="flex text-3xl mb-4 w-full justify-between items-center">
@@ -19,7 +15,7 @@ export function PlayerList({
         <div>🙋🏼‍♀️</div>
       </div>
       <div className="grid grid-cols-2 grow w-full place-items-center overflow-y-auto">
-        {game.players.map((player, index) => (
+        {players.map((player, index) => (
           <div
             key={player.id}
             className="flex space-x-2 w-full items-center justify-center"

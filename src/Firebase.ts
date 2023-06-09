@@ -1,9 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
+import {
+  connectFunctionsEmulator,
+  getFunctions,
+  httpsCallable,
+} from "firebase/functions";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { CreateImageRequest, CreateModerationRequest, CreateModerationResponse, ImagesResponse } from "openai";
+import {
+  CreateImageRequest,
+  CreateModerationRequest,
+  CreateModerationResponse,
+  ImagesResponse,
+} from "openai";
 
 const firebaseConfig = {
   apiKey: import.meta.env["VITE_FIREBASE_API_KEY"],
@@ -27,13 +36,19 @@ if (import.meta.env.DEV) {
   console.log("Firebase Config", firebaseConfig);
   connectFunctionsEmulator(functions, "localhost", 5001);
   connectFirestoreEmulator(db, "localhost", 8080);
-  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+  connectAuthEmulator(auth, "http://localhost:9099");
 }
 
 export const api = {
   openai: {
-    generateImage: httpsCallable<CreateImageRequest, undefined | ImagesResponse>(functions, "openai-generateImage"),
-    generateText: httpsCallable<CreateModerationRequest, undefined | CreateModerationResponse>(functions, "openai-generateText"),
+    generateImage: httpsCallable<
+      CreateImageRequest,
+      undefined | ImagesResponse
+    >(functions, "openai-generateImage"),
+    generateText: httpsCallable<
+      CreateModerationRequest,
+      undefined | CreateModerationResponse
+    >(functions, "openai-generateText"),
     getModeration: httpsCallable(functions, "openai-getModeration"),
   },
-}
+};
